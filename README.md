@@ -8,6 +8,15 @@ This is an Azure Functions binding validating JWT Tokens for HTTP Triggered Azur
 ## Support & Usage
 The binding is only tested on ASP.NET Core 3.1 Azure Functions with the Azure Functions v3.
 
+[Find this package on NuGet](https://www.nuget.org/packages/HexMaster.Functions.JwtBinding/)  
+
+Package Manager  
+`Install-Package HexMaster.Functions.JwtBindin`
+
+.NET CLI  
+`dotnet add package HexMaster.Functions.JwtBinding`
+
+
 ## Validating tokens
 Let's say you run a SPA in which you want users to log in. You'll probably end up with a JWT token (or Access Token if you like). But now, you want to call a backend system, and pass that token so your backend can verify and identify the user. In conventional ASP.NET Core projects, you can add token validation to the request pipeline. In Azure Functions you can not. And this is where the binding kicks in. You need to, _manually_, validate the token and verify the caller's identity. And I thought is was a good idea to create a custom binding validating the token and -in the end- make sure who calls our functions.
 
