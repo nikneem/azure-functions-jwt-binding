@@ -20,11 +20,9 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore "./src/JWT Binding.sln"
     - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet build "./src/JWT Binding.sln" --configuration Release --no-restore
 
     - name: Publish NuGet
       uses: brandedoutcast/publish-nuget@v2.5.5
