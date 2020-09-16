@@ -27,5 +27,5 @@ jobs:
     - name: Publish NuGet
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
-        PROJECT_FILE_PATH: src/HexMaster.ShortLink.Core/HexMaster.ShortLink.Core.csproj
+        PROJECT_FILE_PATH: src/HexMaster.Functions.JwtBinding/HexMaster.Functions.JwtBinding.csproj
         NUGET_KEY: ${{secrets.NUGET_KEY}}
