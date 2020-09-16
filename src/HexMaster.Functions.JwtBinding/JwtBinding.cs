@@ -34,6 +34,7 @@ namespace HexMaster.Functions.JwtBinding
                     arg.Audience,
                     arg.Issuer);
             }
+            throw new Exception("Authorization failure");
         }
     }
 }
