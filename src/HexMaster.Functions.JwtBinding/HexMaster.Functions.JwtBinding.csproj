@@ -1,7 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Eduard Keilholz</Authors>
+    <Product>Azure Functions JWT Validation Input Binding</Product>
+    <Description>This is an input binding for Azure Functions allowing you to validate JWT tokens for Azure Functions with a HTTP trigger.</Description>
+    <PackageProjectUrl>https://github.com/nikneem/azure-functions-jwt-binding</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/nikneem/azure-functions-jwt-binding</RepositoryUrl>
+    <PackageTags>C#, Azure Functions, Binding, JWT, Token, Validation</PackageTags>
+    <PackageReleaseNotes>Initial project creation</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +20,13 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Core" Version="3.0.18" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.1.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
