@@ -1,0 +1,24 @@
+name: Build & Test
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./src
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Install dependencies
+      run: dotnet restore "./src/JWT Binding.sln"
+    - name: Build
+      run: dotnet build "./src/JWT Binding.sln" --configuration Release --no-restore
+
