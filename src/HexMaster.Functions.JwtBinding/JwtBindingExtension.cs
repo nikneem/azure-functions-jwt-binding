@@ -12,7 +12,7 @@ namespace HexMaster.Functions.JwtBinding
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.AddExtension<Functions.JwtBinding.JwtBinding>();
+            builder.AddExtension<JwtBinding>();
             return builder;
         }
     }
