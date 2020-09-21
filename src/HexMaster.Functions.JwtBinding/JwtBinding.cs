@@ -3,7 +3,6 @@ using System.Net.Http.Headers;
 using HexMaster.Functions.JwtBinding.Exceptions;
 using HexMaster.Functions.JwtBinding.Model;
 using HexMaster.Functions.JwtBinding.TokenValidator;
-using HexMaster.Functions.JwtBinding.TokenValidator.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Config;
@@ -14,12 +13,12 @@ namespace HexMaster.Functions.JwtBinding
     [Extension("JwtBinding", "JwtBinding")]
     public class JwtBinding : IExtensionConfigProvider
     {
-        private readonly ITokenValidatorService _service;
+        private readonly TokenValidatorService _service;
         private readonly IHttpContextAccessor _http;
         private readonly ILogger<JwtBinding> _logger;
 
         public JwtBinding(
-            ITokenValidatorService service,
+            TokenValidatorService service,
             IHttpContextAccessor http, 
             ILogger<JwtBinding> logger)
         {

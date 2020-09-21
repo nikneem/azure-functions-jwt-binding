@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using HexMaster.Functions.JwtBinding.Exceptions;
 using HexMaster.Functions.JwtBinding.Model;
-using HexMaster.Functions.JwtBinding.TokenValidator.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -16,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace HexMaster.Functions.JwtBinding.TokenValidator
 {
-    public class TokenValidatorService : ITokenValidatorService
+    public class TokenValidatorService
     {
         private readonly ILogger<TokenValidatorService> _logger;
         private ICollection<SecurityKey> _securityKeys;
@@ -48,7 +47,6 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 var securityKeys = GetSigningKeys(issuer).Result;
                 validationParameter.IssuerSigningKeys = securityKeys;
             }
-
 
             try
             {
