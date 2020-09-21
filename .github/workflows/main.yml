@@ -2,28 +2,28 @@ name: Build & Release to NuGet
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     env:
       working-directory: ./src
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.301
-    - name: Install dependencies
-      run: dotnet restore "./src/JWT Binding.sln"
-    - name: Build
-      run: dotnet build "./src/JWT Binding.sln" --configuration Release --no-restore
-
-    - name: Publish NuGet
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        PROJECT_FILE_PATH: src/HexMaster.Functions.JwtBinding/HexMaster.Functions.JwtBinding.csproj
-        NUGET_KEY: ${{secrets.NUGET_KEY}}
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.301
+      - name: Install dependencies
+        run: dotnet restore "./src"
+      - name: Build solution
+        run: dotnet build "./src" --configuration Release --no-restore
+      - name: Execute unit tests
+        run: dotnet test "./src"
+      - name: Publish NuGet
+        uses: brandedoutcast/publish-nuget@v2.5.5
+        with:
+          PROJECT_FILE_PATH: src/HexMaster.Functions.JwtBinding/HexMaster.Functions.JwtBinding.csproj
+          NUGET_KEY: ${{secrets.NUGET_KEY}}
