@@ -95,7 +95,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
                 _audience,
-                _issuer);
+                _issuer,
+                _signature);
         }
 
 
