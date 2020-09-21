@@ -22,4 +22,4 @@ jobs:
     - name: Build solution
       run: dotnet build "./src/JWT Binding.sln" --configuration Release --no-restore
     - name: Execute unit tests
-      run: dotnet test "./src/*.Tests.csproj"
+      run: dotnet test "./src"
