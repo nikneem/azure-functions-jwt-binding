@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <Authors>Eduard Keilholz</Authors>
     <Product>Azure Functions JWT Validation Input Binding</Product>
     <Description>This is an input binding for Azure Functions allowing you to validate JWT tokens for Azure Functions with a HTTP trigger.</Description>
@@ -12,8 +12,10 @@
     <RepositoryUrl>https://github.com/nikneem/azure-functions-jwt-binding</RepositoryUrl>
     <PackageTags>C#, Azure Functions, Binding, JWT, Token, Validation</PackageTags>
     <PackageReleaseNotes>Added signature validation
-Added token provider configuration download</PackageReleaseNotes>
-    <FileVersion>0.0.3.0</FileVersion>
+Added token provider configuration download
+Added DI
+Added logging</PackageReleaseNotes>
+    <FileVersion>0.0.4.0</FileVersion>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
