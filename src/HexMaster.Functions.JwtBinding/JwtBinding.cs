@@ -48,8 +48,8 @@ namespace HexMaster.Functions.JwtBinding
                 _logger.LogWarning("Now validating token");
                 return _service.ValidateToken(
                     headerValue,
-                    arg.Audience,
                     arg.Issuer,
+                    arg.Audience,
                     arg.Signature);
             }
             throw new AuthorizationOperationException();

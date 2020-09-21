@@ -23,25 +23,20 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
 
         public AuthorizedModel ValidateToken(
             AuthenticationHeaderValue value,
-            string audience,
             string issuer,
+            string audience,
             string signature)
         {
             if (value?.Scheme != "Bearer")
             {
                 throw new AuthorizationSchemeNotSupportedException(value?.Scheme);
             }
-
-            var validationParameter = new TokenValidationParameters
+            if (string.IsNullOrWhiteSpace(issuer))
             {
-                RequireSignedTokens = false,
-                ValidAudience = audience,
-                ValidateAudience = !string.IsNullOrWhiteSpace(audience),
-                ValidIssuer = issuer,
-                ValidateIssuer = !string.IsNullOrWhiteSpace(issuer),
-                ValidateIssuerSigningKey = false,
-                ValidateLifetime = true,
-            };
+                throw new ConfigurationException("Configuring an issuer is required in order to validate a JWT Token");
+            }
+
+            var validationParameter = GetTokenValidationParameters(issuer, audience);
 
             if (!string.IsNullOrWhiteSpace(signature))
             {
@@ -58,13 +53,10 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             try
             {
                 var handler = new JwtSecurityTokenHandler();
-                handler.ValidateToken(value.Parameter, validationParameter, out var token);
-                var jwtToken = token as JwtSecurityToken;
-                return new AuthorizedModel
-                {
-                    Subject = jwtToken.Subject,
-                    Name = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value
-                };
+                var claimsPrincipal = handler.ValidateToken(value.Parameter, validationParameter, out var token);
+
+                var displayName = GetDisplayNameFromToken(claimsPrincipal);
+                return  GetAuthorizedModelFromToken(token, displayName);
             }
             catch (SecurityTokenSignatureKeyNotFoundException ex1)
             {
@@ -81,6 +73,46 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 _logger.LogError(ex, "Unknown exception occurred while trying to validate JWT Token");
                 throw new AuthorizationFailedException(ex);
             }
+        }
+
+        private static AuthorizedModel GetAuthorizedModelFromToken(SecurityToken token, string displayName)
+        {
+            if (token is JwtSecurityToken jwtToken)
+            {
+                var nameId = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.NameId)?.Value;
+                var givenName = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.GivenName)?.Value;
+                return new AuthorizedModel
+                {
+                    Subject = jwtToken.Subject ?? nameId,
+                    Name = displayName ?? givenName
+                };
+            }
+
+            return null;
+        }
+
+        private static string GetDisplayNameFromToken(ClaimsPrincipal claimsPrincipal)
+        {
+            if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+            {
+                return claimsIdentity.Claims.FirstOrDefault(clm => clm.Type == claimsIdentity.NameClaimType)?.Value;
+            }
+            return null;
+        }
+
+        private static TokenValidationParameters GetTokenValidationParameters(string issuer, string audience)
+        {
+            var validationParameter = new TokenValidationParameters
+            {
+                RequireSignedTokens = false,
+                ValidAudience = audience,
+                ValidateAudience = !string.IsNullOrWhiteSpace(audience),
+                ValidIssuer = issuer,
+                ValidateIssuer = true,
+                ValidateIssuerSigningKey = false,
+                ValidateLifetime = true,
+            };
+            return validationParameter;
         }
 
         private async Task<ICollection<SecurityKey>> GetSigningKeys(string issuer)

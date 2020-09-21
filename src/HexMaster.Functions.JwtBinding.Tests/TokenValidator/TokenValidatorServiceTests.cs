@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using HexMaster.Functions.JwtBinding.Exceptions;
+using HexMaster.Functions.JwtBinding.Model;
 using HexMaster.Functions.JwtBinding.TokenValidator;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -24,12 +25,23 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         private string _token;
         private string _subject;
         private string _signature;
+        private string _givenName;
 
         [SetUp]
         public void Setup()
         {
             _loggerMock = new Mock<ILogger<TokenValidatorService>>();
             _service = new TokenValidatorService(_loggerMock.Object);
+        }
+
+        [Test]
+        public void WhenTokenWithSymmetricSignatureIsValid_ThenItReturnsAuthorizedModel()
+        {
+            WithValidJwtToken();
+            var model = Validate();
+
+            Assert.AreEqual(model.Subject, _subject);
+            Assert.AreEqual(model.Name, _givenName);
         }
 
         [Test]
@@ -40,9 +52,56 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             Assert.Throws<AuthorizationSchemeNotSupportedException>(Act);
         }
 
+        [Test]
+        public void WhenTokenWithSymmetricSignatureIsInvalid_ThenItThrowsAuthorizationFailedException()
+        {
+            WithValidJwtToken();
+            WithInvalidSignature();
+            Assert.Throws<AuthorizationFailedException>(Act);
+        }
+
+        [Test]
+        public void WhenTokenIssuerIsInvalid_ThenItThrowsAuthorizationFailedException()
+        {
+            WithValidJwtToken();
+            WithInvalidIssuer();
+            Assert.Throws<AuthorizationFailedException>(Act);
+        }
+        [Test]
+        public void WhenTokenIssuerIsNull_ThenItThrowsConfigurationException()
+        {
+            WithValidJwtToken();
+            WithEmptyIssuer();
+            Assert.Throws<ConfigurationException>(Act);
+        }
+
+        [Test]
+        public void WhenTokenAudienceIsInvalid_ThenItThrowsAuthorizationFailedException()
+        {
+            WithValidJwtToken();
+            WithInvalidAudience();
+            Assert.Throws<AuthorizationFailedException>(Act);
+        }
+
         private void WithInvalidScheme()
         {
             _scheme = "Invalid";
+        }
+        private void WithInvalidSignature()
+        {
+            _signature = Guid.NewGuid().ToString();
+        }
+        private void WithInvalidIssuer()
+        {
+            _issuer = "https://random-issuer.com";
+        }
+        private void WithEmptyIssuer()
+        {
+            _issuer = null;
+        }
+        private void WithInvalidAudience()
+        {
+            _audience = "invalid-audience";
         }
 
         private void WithValidJwtToken()
@@ -51,6 +110,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             _issuer = "https://my-valid-issuer";
             _scheme = "Bearer";
             _subject = $"{DateTime.UtcNow.Ticks}";
+            _givenName = "Tommy Token";
             _signature = Guid.NewGuid().ToString();
             _token = CreateJwtToken();
         }
@@ -78,8 +138,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         private ClaimsIdentity CreateClaimsIdentities()
         {
             var claimsIdentity = new ClaimsIdentity();
-            claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, _subject));
-            claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, "Freddy Franeker"));
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.NameId, _subject));
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.GivenName, _givenName));
 
             //var roles = Enumerable.Empty<Role>(); // Not a real list.
 
@@ -92,10 +152,18 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
 
         private void Act()
         {
-            _service.ValidateToken(
+             _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
-                _audience,
                 _issuer,
+                _audience,
+                _signature);
+        }
+        private AuthorizedModel Validate()
+        {
+            return _service.ValidateToken(
+                new AuthenticationHeaderValue(_scheme, _token),
+                _issuer,
+                _audience,
                 _signature);
         }
 
