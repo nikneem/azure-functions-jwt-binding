@@ -5,27 +5,30 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using HexMaster.Functions.JwtBinding.Exceptions;
 using HexMaster.Functions.JwtBinding.Model;
+using HexMaster.Functions.JwtBinding.TokenValidator.Contracts;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HexMaster.Functions.JwtBinding.Helpers
+namespace HexMaster.Functions.JwtBinding.TokenValidator
 {
-    public static class TokenValidator
+    public class TokenValidatorService : ITokenValidatorService
     {
+        private readonly ILogger<TokenValidatorService> _logger;
+        private ICollection<SecurityKey> _securityKeys;
 
-        private static ICollection<SecurityKey> _securityKeys;
-
-        public static AuthorizedModel ValidateToken(
+        public AuthorizedModel ValidateToken(
             AuthenticationHeaderValue value,
             string audience,
             string issuer)
         {
-            var authorizedModel = new AuthorizedModel();
             if (value?.Scheme != "Bearer")
-                return null;
-
+            {
+                throw new AuthorizationSchemeNotSupportedException(value?.Scheme);
+            }
 
             var securityKeys = GetSigningKeys(issuer).Result;
             var validationParameter = new TokenValidationParameters
@@ -45,31 +48,30 @@ namespace HexMaster.Functions.JwtBinding.Helpers
                 var handler = new JwtSecurityTokenHandler();
                 handler.ValidateToken(value.Parameter, validationParameter, out var token);
                 var jwtToken = token as JwtSecurityToken;
-                authorizedModel.IsAuthorized = true;
-                authorizedModel.Subject = jwtToken.Subject;
-                authorizedModel.Name = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-
+                return new AuthorizedModel
+                {
+                    Subject = jwtToken.Subject,
+                    Name = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value
+                };
             }
             catch (SecurityTokenSignatureKeyNotFoundException ex1)
             {
-                Console.WriteLine(ex1.Message);
-                Console.ResetColor();
+                _logger.LogError(ex1, "Failed to validate token signature, token is considered to be invalid");
+                throw new AuthorizationFailedException(ex1);
             }
             catch (SecurityTokenException ex2)
             {
-                Console.WriteLine(ex2.Message);
-                Console.ResetColor();
+                _logger.LogError(ex2, "Failed to validate, token is considered to be invalid");
+                throw new AuthorizationFailedException(ex2);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
+                _logger.LogError(ex, "Unknown exception occurred while trying to validate JWT Token");
+                throw new AuthorizationFailedException(ex);
             }
-
-            return authorizedModel;
         }
 
-        private static async Task<ICollection<SecurityKey>> GetSigningKeys(string issuer)
+        private async Task<ICollection<SecurityKey>> GetSigningKeys(string issuer)
         {
             if (_securityKeys == null)
             {
@@ -87,6 +89,11 @@ namespace HexMaster.Functions.JwtBinding.Helpers
             }
 
             return _securityKeys;
+        }
+
+        public TokenValidatorService(ILogger<TokenValidatorService> logger)
+        {
+            _logger = logger;
         }
     }
 }

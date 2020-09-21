@@ -1,5 +1,8 @@
 ﻿using System;
+using HexMaster.Functions.JwtBinding.TokenValidator;
+using HexMaster.Functions.JwtBinding.TokenValidator.Contracts;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HexMaster.Functions.JwtBinding
 {
@@ -12,6 +15,7 @@ namespace HexMaster.Functions.JwtBinding
                 throw new ArgumentNullException(nameof(builder));
             }
 
+            builder.Services.AddScoped<ITokenValidatorService, TokenValidatorService>();
             builder.AddExtension<JwtBinding>();
             return builder;
         }
