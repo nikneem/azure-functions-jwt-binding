@@ -18,7 +18,8 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Install dependencies
-      run: dotnet restore "./src/JWT Binding.sln"
-    - name: Build
-      run: dotnet build "./src/JWT Binding.sln" --configuration Release --no-restore
-
+      run: dotnet restore "./src"
+    - name: Build solution
+      run: dotnet build "./src" --configuration Release --no-restore
+    - name: Execute unit tests
+      run: dotnet test "./src"
