@@ -23,7 +23,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         private string _scheme;
         private string _token;
         private string _subject;
-        private string _secret;
+        private string _signature;
 
         [SetUp]
         public void Setup()
@@ -51,7 +51,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             _issuer = "https://my-valid-issuer";
             _scheme = "Bearer";
             _subject = $"{DateTime.UtcNow.Ticks}";
-            _secret = Guid.NewGuid().ToString();
+            _signature = Guid.NewGuid().ToString();
             _token = CreateJwtToken();
         }
 
@@ -69,7 +69,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                 signingCredentials:
                 new SigningCredentials(
                     new SymmetricSecurityKey(
-                        Encoding.Default.GetBytes(_secret)),
+                        Encoding.Default.GetBytes(_signature)),
                     SecurityAlgorithms.HmacSha256Signature));
 
             return tokenHandler.WriteToken(token);
@@ -95,7 +95,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
                 _audience,
-                _issuer);
+                _issuer,
+                _signature);
         }
 
 

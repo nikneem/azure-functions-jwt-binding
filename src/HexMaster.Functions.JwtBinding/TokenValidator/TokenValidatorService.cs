@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using HexMaster.Functions.JwtBinding.Exceptions;
 using HexMaster.Functions.JwtBinding.Model;
@@ -23,14 +24,14 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
         public AuthorizedModel ValidateToken(
             AuthenticationHeaderValue value,
             string audience,
-            string issuer)
+            string issuer,
+            string signature)
         {
             if (value?.Scheme != "Bearer")
             {
                 throw new AuthorizationSchemeNotSupportedException(value?.Scheme);
             }
 
-            var securityKeys = GetSigningKeys(issuer).Result;
             var validationParameter = new TokenValidationParameters
             {
                 RequireSignedTokens = false,
@@ -40,8 +41,19 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 ValidateIssuer = !string.IsNullOrWhiteSpace(issuer),
                 ValidateIssuerSigningKey = false,
                 ValidateLifetime = true,
-                IssuerSigningKeys = securityKeys
             };
+
+            if (!string.IsNullOrWhiteSpace(signature))
+            {
+                var sig = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(signature));
+                validationParameter.IssuerSigningKey = sig;
+            }
+            else
+            {
+                var securityKeys = GetSigningKeys(issuer).Result;
+                validationParameter.IssuerSigningKeys = securityKeys;
+            }
+
 
             try
             {

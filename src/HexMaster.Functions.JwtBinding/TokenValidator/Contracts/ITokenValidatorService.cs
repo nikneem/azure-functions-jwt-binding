@@ -8,6 +8,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator.Contracts
         AuthorizedModel ValidateToken(
             AuthenticationHeaderValue value,
             string audience,
-            string issuer);
+            string issuer,
+            string signature);
     }
 }

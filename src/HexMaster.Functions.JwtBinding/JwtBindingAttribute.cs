@@ -26,6 +26,7 @@ namespace HexMaster.Functions.JwtBinding
         public string Scopes { get; set; }
         [AutoResolve] public string Audience { get; set; }
         [AutoResolve] public string Issuer { get; set; }
+        [AutoResolve] public string Signature { get; set; }
 
     }
 }

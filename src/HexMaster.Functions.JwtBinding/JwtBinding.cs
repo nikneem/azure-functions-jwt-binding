@@ -49,7 +49,8 @@ namespace HexMaster.Functions.JwtBinding
                 return _service.ValidateToken(
                     headerValue,
                     arg.Audience,
-                    arg.Issuer);
+                    arg.Issuer,
+                    arg.Signature);
             }
             throw new AuthorizationOperationException();
         }
