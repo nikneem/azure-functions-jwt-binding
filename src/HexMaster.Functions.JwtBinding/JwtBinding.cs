@@ -44,7 +44,9 @@ namespace HexMaster.Functions.JwtBinding
             {
                 var authHeaderValue = _http.HttpContext.Request.Headers["Authorization"];
                 var headerValue = AuthenticationHeaderValue.Parse(authHeaderValue);
-                _logger.LogWarning("Now validating token");
+                
+                _logger.LogInformation("Now validating token");
+                
                 return _service.ValidateToken(
                     headerValue,
                     arg.Issuer,
