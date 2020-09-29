@@ -4,23 +4,6 @@ Thanks for helping make the Azure Functions JWT Binding better 😍.
 
 There are many areas we can use contributions - ranging from code, documentation, feature proposals, issue triage, samples, and content creation.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of contents**
-
-- [Project governance](#project-governance)
-- [Getting Help](#getting-help)
-- [Contributing Scalers](#contributing-scalers)
-  - [Testing](#testing)
-- [Including Documentation Changes](#including-documentation-changes)
-- [Creating and building a local environment](#creating-and-building-a-local-environment)
-- [Developer Certificate of Origin: Signing your work](#developer-certificate-of-origin-signing-your-work)
-  - [Every commit needs to be signed](#every-commit-needs-to-be-signed)
-  - [I didn't sign my commit, now what?!](#i-didnt-sign-my-commit-now-what)
-- [Code Quality](#code-quality)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ## Getting Help
 
 If you have a question about the Azure Functions JWT Binding or how best to contribute, use either one of the issues you want to work on and write comments, questions or remarks there. We're happy to help you out.
