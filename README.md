@@ -8,7 +8,7 @@ The binding is only tested on ASP.NET Core 3.1 Azure Functions with the Azure Fu
 [Find this package on NuGet](https://www.nuget.org/packages/HexMaster.Functions.JwtBinding/)  
 
 Package Manager  
-`Install-Package HexMaster.Functions.JwtBindin`
+`Install-Package HexMaster.Functions.JwtBinding`
 
 .NET CLI  
 `dotnet add package HexMaster.Functions.JwtBinding`
