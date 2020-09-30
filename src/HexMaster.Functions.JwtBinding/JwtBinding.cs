@@ -49,7 +49,8 @@ namespace HexMaster.Functions.JwtBinding
                     headerValue,
                     arg.Issuer,
                     arg.Audience,
-                    arg.Signature);
+                    arg.Signature,
+                    arg.Scopes);
             }
             throw new AuthorizationOperationException();
         }

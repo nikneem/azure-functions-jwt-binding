@@ -24,7 +24,8 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             AuthenticationHeaderValue value,
             string issuer,
             string audience,
-            string signature)
+            string signature,
+            string scopes)
         {
             if (value?.Scheme != "Bearer")
             {
@@ -52,6 +53,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             {
                 var handler = new JwtSecurityTokenHandler();
                 var claimsPrincipal = handler.ValidateToken(value.Parameter, validationParameter, out var token);
+                ValidateScopes(token, scopes);
 
                 var displayName = GetDisplayNameFromToken(claimsPrincipal);
                 return  GetAuthorizedModelFromToken(token, displayName);
@@ -89,6 +91,37 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             return null;
         }
 
+        private  void ValidateScopes(SecurityToken token, string scopes)
+        {
+            var validScopeClaimTypes = new[] {"scp"};
+            if (string.IsNullOrWhiteSpace(scopes))
+            {
+                return;
+            }
+
+            if (token is JwtSecurityToken jwtToken)
+            {
+                var tokenScopes = new List<string>();
+                foreach (var claimType in validScopeClaimTypes)
+                {
+                    tokenScopes.AddRange(jwtToken.Claims.Where(clm => clm.Type == claimType).Select(clm => clm.Value));
+                }
+
+                foreach (var requiredScope in scopes.Split(','))
+                {
+                    if (!tokenScopes.Contains(requiredScope))
+                    {
+                        throw new AuthorizationScopesException($"Failed to validate scope {requiredScope}, it's missing");
+                    }
+                }
+            }
+            else
+            {
+                throw new AuthorizationScopesException("Failed to validate scopes because the passed token could not be converted to a valid JwtSecurityToken object");
+            }
+
+        }
+
         private static string GetDisplayNameFromToken(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
@@ -108,7 +141,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 ValidIssuer = issuer,
                 ValidateIssuer = true,
                 ValidateIssuerSigningKey = false,
-                ValidateLifetime = true,
+                ValidateLifetime = true
             };
             return validationParameter;
         }
