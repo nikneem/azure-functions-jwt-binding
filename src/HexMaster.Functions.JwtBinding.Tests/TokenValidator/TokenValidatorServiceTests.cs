@@ -26,6 +26,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         private string _subject;
         private string _signature;
         private string _givenName;
+        private string _scopes;
 
         [SetUp]
         public void Setup()
@@ -83,6 +84,15 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             Assert.Throws<AuthorizationFailedException>(Act);
         }
 
+        [Test]
+        public void WhenTokenScopeIsInvalid_ThenItThrowsAuthorizationFailedException()
+        {
+            WithValidJwtToken();
+            WithInvalidScopes();
+            Assert.Throws<AuthorizationFailedException>(Act);
+        }
+
+
         private void WithInvalidScheme()
         {
             _scheme = "Invalid";
@@ -103,6 +113,10 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         {
             _audience = "invalid-audience";
         }
+        private void WithInvalidScopes()
+        {
+            _scopes = "nothing:nothing";
+        }
 
         private void WithValidJwtToken()
         {
@@ -112,6 +126,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             _subject = $"{DateTime.UtcNow.Ticks}";
             _givenName = "Tommy Token";
             _signature = Guid.NewGuid().ToString();
+            _scopes = "something:create,other:list";
             _token = CreateJwtToken();
         }
 
@@ -131,6 +146,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                     new SymmetricSecurityKey(
                         Encoding.Default.GetBytes(_signature)),
                     SecurityAlgorithms.HmacSha256Signature));
+            
 
             return tokenHandler.WriteToken(token);
         }
@@ -141,10 +157,10 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.NameId, _subject));
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.GivenName, _givenName));
 
-            //var roles = Enumerable.Empty<Role>(); // Not a real list.
-
-            //foreach (var role in roles)
-            //{ claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role.RoleName)); }
+            foreach (var scope in _scopes.Split(','))
+            {
+                claimsIdentity.AddClaim(new Claim("scp", scope));
+            }
 
             return claimsIdentity;
         }
@@ -156,7 +172,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                 new AuthenticationHeaderValue(_scheme, _token),
                 _issuer,
                 _audience,
-                _signature);
+                _signature,
+                _scopes);
         }
         private AuthorizedModel Validate()
         {
@@ -164,7 +181,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                 new AuthenticationHeaderValue(_scheme, _token),
                 _issuer,
                 _audience,
-                _signature);
+                _signature,
+                _scopes);
         }
 
 
