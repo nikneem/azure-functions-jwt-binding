@@ -2,6 +2,13 @@
 
 This is an Azure Functions binding validating JWT Tokens for HTTP Triggered Azure Functions.
 
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=nikneem_azure-functions-jwt-binding&metric=code_smells)](https://sonarcloud.io/dashboard?id=nikneem_azure-functions-jwt-binding)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nikneem_azure-functions-jwt-binding&metric=alert_status)](https://sonarcloud.io/dashboard?id=nikneem_azure-functions-jwt-binding)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=nikneem_azure-functions-jwt-binding&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=nikneem_azure-functions-jwt-binding)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=nikneem_azure-functions-jwt-binding&metric=security_rating)](https://sonarcloud.io/dashboard?id=nikneem_azure-functions-jwt-binding)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=nikneem_azure-functions-jwt-binding&metric=sqale_index)](https://sonarcloud.io/dashboard?id=nikneem_azure-functions-jwt-binding)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=nikneem_azure-functions-jwt-binding&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=nikneem_azure-functions-jwt-binding)
+
 ## Support & Usage
 The binding is only tested on ASP.NET Core 3.1 Azure Functions with the Azure Functions v3.
 
