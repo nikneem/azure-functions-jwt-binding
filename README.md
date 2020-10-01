@@ -46,6 +46,3 @@ Note `%JwtBinding:Issuer%` is a reference to the configuration of your Azure Fun
 "JwtBinding:Audience": "your-audience",
 "JwtBinding:Issuer": "https://your-token-provider.com"
 ```
-
-## Roadmap
-There are a couple of checks missing, and two of them will be addressed in the near future. First I want support for scopes so that you can specify a scope per function. This allows you to validate whether or not a caller can access this specific function (or not). And second and most important from security perspective is validating the token signature. At this time, no token signature validation is done which makes the current version too insecure to run in production environments.
