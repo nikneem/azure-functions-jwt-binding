@@ -14,6 +14,9 @@ namespace HexMaster.Functions.JwtBinding
                 throw new ArgumentNullException(nameof(builder));
             }
 
+            var serviceProvider = builder.Services.BuildServiceProvider();
+
+
             builder.Services.AddSingleton<TokenValidatorService>();
             builder.AddExtension<JwtBinding>();
             return builder;
