@@ -12,7 +12,9 @@
         public string Scopes { get; set; }
         public string Roles { get; set; }
 
-        
+        public JwtBindingDebugConfiguration DebugConfiguration { get; set; }
+
+
 
     }
 }

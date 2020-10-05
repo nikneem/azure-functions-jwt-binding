@@ -23,14 +23,55 @@ Package Manager
 ## Validating tokens
 Let's say you run a SPA in which you want users to log in. You'll probably end up with a JWT token (or Access Token if you like). But now, you want to call a backend system, and pass that token so your backend can verify and identify the user. In conventional ASP.NET Core projects, you can add token validation to the request pipeline. In Azure Functions you can not. And this is where the binding kicks in. You need to, _manually_, validate the token and verify the caller's identity. And I thought is was a good idea to create a custom binding validating the token and -in the end- make sure who calls our functions.
 
-### Usage
+## Configuration
+The JwtBinding prefixed is used to configure the binding. The binding uses the Options Pattern to inject the *JwtBinding* configuration section as a *JwtBindingConfiguration* object. The values in the configuration can be overriden by by Binding Attribute arguments.
+
+The Issuer value is mandatory. When no issuer was configured using the app config, or the attribute an exception will be raised and no validation will be done.
+
+The following properties are available using the configuration:
+
+
+* **Issuer** is the name of the issuer. The binding new assumes this is a valid URL to your token provider. This URL is also used to download signatures when no signature was provided through configuration.
+
+* **Audience** is the name of your current audience (client). The token contains a list of 0 or more valid audiences. When configured, the token will be inspected and the configured value must be in the list of token's audiences. When no value was configured, audience validation will be skipped.
+
+* **Signature** is the value of your token signature. The is only when you're using a symmetric signature which is not recommended. If you don't use a symmetric signature, the binding is going to try and download the signature from your token provider. At this time it is not (yet) possible to configure a public key for signature validation.
+
+* **Scopes** is an optional list of (comma seperated) scopes. When configured, all configured scopes must be present in the token. If no scopes were configured, scope validation will be skipped.
+
+* **DebugConfiguration** is a nested object allowing you to configure your environment for running in debug (development) mode.
+    * **Enabled** is a switch to turn debug mode on of off. Note that it's far safer to remove the entire configuration block in acceptance / production environments.
+    * **Subject** is the fixed *Subject* to return when running in debug mode.
+    * **Name** is the fixed *Name* to return when running in debug mode
+
+### Example
+The example is an example the you can use to paste in your *local.settings.json* when running your azure functions localhost:
+
+```json
+    "JwtBinding:Issuer": "https://your-token-provider.com",
+    "JwtBinding:Audience": "your-secret-api",
+    "JwtBinding:Scopes": "data:read,data:write",
+    "JwtBinding:Roles": "Role1,Role2"
+```
+
+\*\* The *Roles* configuration is a future configuration value which is not supported yet
+
+
+## Usage
 To use the token binding, simply add an `AuthorizedModel` parameter to your function with the `JwtBinding` attribute and you're good to go.
 
 ```csharp
+// This example fully relies on your app config
 [JwtBinding] AuthorizedModel auth
 ```
 
-### Options
+```csharp
+// This example relies on your app config, but overwrites
+// the scopes configuration with a new value
+[JwtBinding(scopes: "data:delete")] AuthorizedModel auth
+```
+
+## About token validation
 With JWT Tokens you really want to validate some extra stuff before just accepting the request. The binding uses the [JwtSecurityTokenHandler ](https://docs.microsoft.com/en-us/dotnet/api/system.identitymodel.tokens.jwt.jwtsecuritytokenhandler?view=azure-dotnet&WT.mc_id=AZ-MVP-5003924) class under the hood, which takes care of some validations for us. Not all of them however.
 
 ### Issuer and Audiences

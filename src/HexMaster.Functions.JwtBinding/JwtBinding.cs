@@ -40,9 +40,18 @@ namespace HexMaster.Functions.JwtBinding
 
         private AuthorizedModel BuildItemFromAttribute(JwtBindingAttribute arg)
         {
-            var configuration = _configuration.Value;
+            var configuration = GetFunctionConfiguration(arg);
+            if ((configuration.DebugConfiguration?.Enabled).GetValueOrDefault())
+            {
+                _logger.LogWarning("## WARNING ## - The JWT Validation Binding is running in DEBUG mode and currently returns fixed values!");
+                return new AuthorizedModel
+                {
+                    Name = configuration.DebugConfiguration?.Name,
+                    Subject = configuration.DebugConfiguration?.Subject
+                };
+            }
 
-            if (string.IsNullOrWhiteSpace(arg.Issuer))
+            if (string.IsNullOrWhiteSpace(configuration.Issuer))
             {
                 _logger.LogWarning("No valid issuer configured, cannot validate token");
                 throw new ArgumentNullException(nameof(arg.Issuer), "The JwtBinding requires an issuer to validate JWT Tokens");
@@ -51,15 +60,22 @@ namespace HexMaster.Functions.JwtBinding
             {
                 var authHeaderValue = _http.HttpContext.Request.Headers["Authorization"];
                 var headerValue = AuthenticationHeaderValue.Parse(authHeaderValue);
-                _logger.LogWarning("Now validating token");
-                return _service.ValidateToken(
-                    headerValue,
-                    arg.Issuer,
-                    arg.Audience,
-                    arg.Signature,
-                    arg.Scopes);
+                _logger.LogInformation("Now validating token");
+
+                return _service.ValidateToken(headerValue, configuration);
             }
             throw new AuthorizationOperationException();
+        }
+
+        private JwtBindingConfiguration GetFunctionConfiguration(JwtBindingAttribute arg)
+        {
+            var configuration = _configuration.Value ?? new JwtBindingConfiguration();
+            configuration.Issuer = arg.Issuer ?? configuration.Issuer;
+            configuration.Audience = arg.Issuer ?? configuration.Issuer;
+            configuration.Scopes = arg.Issuer ?? configuration.Scopes;
+            configuration.Roles = arg.Issuer ?? configuration.Roles;
+            configuration.Signature = arg.Issuer ?? configuration.Signature;
+            return configuration;
         }
     }
 }
