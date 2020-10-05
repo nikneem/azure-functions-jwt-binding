@@ -52,6 +52,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 var handler = new JwtSecurityTokenHandler();
                 var claimsPrincipal = handler.ValidateToken(value.Parameter, validationParameter, out var token);
                 ValidateScopes(token, config.Scopes);
+                ValidateRoles(token, config.Roles);
 
                 var displayName = GetDisplayNameFromToken(claimsPrincipal);
                 return  GetAuthorizedModelFromToken(token, displayName);
@@ -117,8 +118,37 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             {
                 throw new AuthorizationScopesException("Failed to validate scopes because the passed token could not be converted to a valid JwtSecurityToken object");
             }
-
         }
+        private  void ValidateRoles(SecurityToken token, string roles)
+        {
+            var validScopeClaimTypes = new[] {"roles"};
+            if (string.IsNullOrWhiteSpace(roles))
+            {
+                return;
+            }
+
+            if (token is JwtSecurityToken jwtToken)
+            {
+                var tokenRoles = new List<string>();
+                foreach (var claimType in validScopeClaimTypes)
+                {
+                    tokenRoles.AddRange(jwtToken.Claims.Where(clm => clm.Type == claimType).Select(clm => clm.Value));
+                }
+
+                foreach (var requiredRole in roles.Split(','))
+                {
+                    if (!tokenRoles.Contains(requiredRole))
+                    {
+                        throw new AuthorizationScopesException($"Failed to validate role {requiredRole}, it's missing");
+                    }
+                }
+            }
+            else
+            {
+                throw new AuthorizationScopesException("Failed to validate roles because the passed token could not be converted to a valid JwtSecurityToken object");
+            }
+        }
+
 
         private static string GetDisplayNameFromToken(ClaimsPrincipal claimsPrincipal)
         {
