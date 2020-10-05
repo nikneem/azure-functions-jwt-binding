@@ -39,6 +39,8 @@ The following properties are available using the configuration:
 
 * **Scopes** is an optional list of (comma seperated) scopes. When configured, all configured scopes must be present in the token. If no scopes were configured, scope validation will be skipped.
 
+* **Roles** is an optional list of (comma seperated) roles. When configured, all configured roles must be present in the token. If no roles were configured, role validation will be skipped.
+
 * **DebugConfiguration** is a nested object allowing you to configure your environment for running in debug (development) mode.
     * **Enabled** is a switch to turn debug mode on of off. Note that it's far safer to remove the entire configuration block in acceptance / production environments.
     * **Subject** is the fixed *Subject* to return when running in debug mode.
@@ -53,8 +55,6 @@ The example is an example the you can use to paste in your *local.settings.json*
     "JwtBinding:Scopes": "data:read,data:write",
     "JwtBinding:Roles": "Role1,Role2"
 ```
-
-\*\* The *Roles* configuration is a future configuration value which is not supported yet
 
 
 ## Usage
