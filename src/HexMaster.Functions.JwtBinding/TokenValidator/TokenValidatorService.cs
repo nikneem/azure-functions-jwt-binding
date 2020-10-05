@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using HexMaster.Functions.JwtBinding.Configuration;
 using HexMaster.Functions.JwtBinding.Exceptions;
 using HexMaster.Functions.JwtBinding.Model;
 using Microsoft.Extensions.Logging;
@@ -22,30 +23,27 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
 
         public AuthorizedModel ValidateToken(
             AuthenticationHeaderValue value,
-            string issuer,
-            string audience,
-            string signature,
-            string scopes)
+            JwtBindingConfiguration config)
         {
             if (value?.Scheme != "Bearer")
             {
                 throw new AuthorizationSchemeNotSupportedException(value?.Scheme);
             }
-            if (string.IsNullOrWhiteSpace(issuer))
+            if (string.IsNullOrWhiteSpace(config.Issuer))
             {
                 throw new ConfigurationException("Configuring an issuer is required in order to validate a JWT Token");
             }
 
-            var validationParameter = GetTokenValidationParameters(issuer, audience);
+            var validationParameter = GetTokenValidationParameters(config.Issuer, config.Audience);
 
-            if (!string.IsNullOrWhiteSpace(signature))
+            if (!string.IsNullOrWhiteSpace(config.Signature))
             {
-                var sig = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(signature));
+                var sig = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.Signature));
                 validationParameter.IssuerSigningKey = sig;
             }
             else
             {
-                var securityKeys = GetSigningKeys(issuer).Result;
+                var securityKeys = GetSigningKeys(config.Issuer).Result;
                 validationParameter.IssuerSigningKeys = securityKeys;
             }
 
@@ -53,7 +51,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             {
                 var handler = new JwtSecurityTokenHandler();
                 var claimsPrincipal = handler.ValidateToken(value.Parameter, validationParameter, out var token);
-                ValidateScopes(token, scopes);
+                ValidateScopes(token, config.Scopes);
 
                 var displayName = GetDisplayNameFromToken(claimsPrincipal);
                 return  GetAuthorizedModelFromToken(token, displayName);

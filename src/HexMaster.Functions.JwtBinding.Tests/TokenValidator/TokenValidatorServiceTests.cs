@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
+using HexMaster.Functions.JwtBinding.Configuration;
 using HexMaster.Functions.JwtBinding.Exceptions;
 using HexMaster.Functions.JwtBinding.Model;
 using HexMaster.Functions.JwtBinding.TokenValidator;
@@ -68,6 +69,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             WithInvalidIssuer();
             Assert.Throws<AuthorizationFailedException>(Act);
         }
+
         [Test]
         public void WhenTokenIssuerIsNull_ThenItThrowsConfigurationException()
         {
@@ -97,22 +99,27 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         {
             _scheme = "Invalid";
         }
+
         private void WithInvalidSignature()
         {
             _signature = Guid.NewGuid().ToString();
         }
+
         private void WithInvalidIssuer()
         {
             _issuer = "https://random-issuer.com";
         }
+
         private void WithEmptyIssuer()
         {
             _issuer = null;
         }
+
         private void WithInvalidAudience()
         {
             _audience = "invalid-audience";
         }
+
         private void WithInvalidScopes()
         {
             _scopes = "nothing:nothing";
@@ -136,8 +143,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
 
             // Create JWToken
             var token = tokenHandler.CreateJwtSecurityToken(
-                _issuer, 
-                _audience, 
+                _issuer,
+                _audience,
                 CreateClaimsIdentities(),
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddDays(1),
@@ -146,7 +153,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                     new SymmetricSecurityKey(
                         Encoding.Default.GetBytes(_signature)),
                     SecurityAlgorithms.HmacSha256Signature));
-            
+
 
             return tokenHandler.WriteToken(token);
         }
@@ -168,23 +175,30 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
 
         private void Act()
         {
-             _service.ValidateToken(
+            var config = new JwtBindingConfiguration
+            {
+                Signature = _signature,
+                Scopes = _scopes,
+                Audience = _audience,
+                Issuer = _issuer
+            };
+            _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
-                _issuer,
-                _audience,
-                _signature,
-                _scopes);
+                config);
         }
+
         private AuthorizedModel Validate()
         {
+            var config = new JwtBindingConfiguration
+            {
+                Signature = _signature,
+                Scopes = _scopes,
+                Audience = _audience,
+                Issuer = _issuer
+            };
             return _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
-                _issuer,
-                _audience,
-                _signature,
-                _scopes);
+                config);
         }
-
-
     }
 }
