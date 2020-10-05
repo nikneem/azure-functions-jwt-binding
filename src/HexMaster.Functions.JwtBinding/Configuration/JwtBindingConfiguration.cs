@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HexMaster.Functions.JwtBinding.Configuration
+﻿namespace HexMaster.Functions.JwtBinding.Configuration
 {
     public sealed class JwtBindingConfiguration
     {
+
+        public const string SectionName = Constants.ConfigurationSectionName;
 
         public string Issuer { get; set; }
         public string Audience { get; set; }

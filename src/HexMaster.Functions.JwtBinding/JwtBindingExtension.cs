@@ -1,6 +1,8 @@
 ﻿using System;
+using HexMaster.Functions.JwtBinding.Configuration;
 using HexMaster.Functions.JwtBinding.TokenValidator;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HexMaster.Functions.JwtBinding
@@ -16,7 +18,9 @@ namespace HexMaster.Functions.JwtBinding
 
             var serviceProvider = builder.Services.BuildServiceProvider();
 
-
+            var configuration = serviceProvider.GetService<IConfiguration>();
+            builder.Services.Configure<JwtBindingConfiguration>(configuration.GetSection(JwtBindingConfiguration.SectionName));
+            
             builder.Services.AddSingleton<TokenValidatorService>();
             builder.AddExtension<JwtBinding>();
             return builder;
