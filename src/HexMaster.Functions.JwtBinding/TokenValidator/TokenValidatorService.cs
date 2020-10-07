@@ -180,6 +180,8 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             {
                 var addSlashCharacter = issuer.EndsWith("/") ? "" : "/";
                 var stsDiscoveryEndpoint = $"{issuer}{addSlashCharacter}.well-known/openid-configuration";
+                _logger.LogInformation("Downloading OpenID Configuration from {stsDiscoveryEndpoint}",
+                    stsDiscoveryEndpoint);
                 var retriever = new OpenIdConnectConfigurationRetriever();
                 var configManager =
                     new ConfigurationManager<OpenIdConnectConfiguration>(stsDiscoveryEndpoint, retriever);
@@ -188,6 +190,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                     .GetConfigurationAsync()
                     .ConfigureAwait(false);
 
+                _logger.LogInformation("Found {count} signing keys for token signature", config.SigningKeys.Count);
                 _securityKeys = config.SigningKeys;
             }
 
