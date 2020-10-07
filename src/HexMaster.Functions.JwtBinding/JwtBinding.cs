@@ -71,10 +71,10 @@ namespace HexMaster.Functions.JwtBinding
         {
             var configuration = _configuration.Value ?? new JwtBindingConfiguration();
             configuration.Issuer = arg.Issuer ?? configuration.Issuer;
-            configuration.Audience = arg.Issuer ?? configuration.Issuer;
-            configuration.Scopes = arg.Issuer ?? configuration.Scopes;
-            configuration.Roles = arg.Issuer ?? configuration.Roles;
-            configuration.Signature = arg.Issuer ?? configuration.Signature;
+            configuration.Audience = arg.Audience ?? configuration.Audience;
+            configuration.Scopes = arg.Scopes ?? configuration.Scopes;
+            configuration.Roles = arg.Roles ?? configuration.Roles;
+            configuration.Signature = arg.Signature ?? configuration.Signature;
             return configuration;
         }
     }
