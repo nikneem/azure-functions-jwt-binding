@@ -13,13 +13,14 @@ namespace HexMaster.Functions.JwtBinding
         {
         }
 
-        public JwtBindingAttribute(string issuer = null, string audience = null, string scopes = null, string roles = null, string signature = null)
+        public JwtBindingAttribute(string issuer = null, string audience = null, string scopes = null, string roles = null, string signature = null, string allowedIdentities = null)
         {
             Issuer = issuer;
             Audience = audience;
             Scopes = scopes;
             Roles = roles;
             Signature = signature;
+            AllowedIdentities = allowedIdentities;
         }
 
         [AutoResolve] 
@@ -42,5 +43,8 @@ namespace HexMaster.Functions.JwtBinding
         [Description("Pass in a valid signature key. If no signature is passed, the validator will try to download them from your token provider. When that fails, the token validation fails.")]
         public string Signature { get; set; }
 
+        [AutoResolve]
+        [Description("Comma seperated identifiers of identities which are allowed. This will try to be matched on the `sub` claim of the token.")]
+        public string AllowedIdentities { get; set; }
     }
 }
