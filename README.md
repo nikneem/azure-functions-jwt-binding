@@ -41,6 +41,8 @@ The following properties are available using the configuration:
 
 * **Roles** is an optional list of (comma separated) roles. When configured, all configured roles must be present in the token. If no roles were configured, role validation will be skipped.
 
+* **AllowedIdentities** is an optional list of (comma separated) identities. When configured, the subject of the token is matched against one of the specified identies. If not found, an exception is thrown. If no identities were configured, identity validation will be skipped.
+
 * **DebugConfiguration** is a nested object allowing you to configure your environment for running in debug (development) mode.
     * **Enabled** is a switch to turn debug mode on or off. Set this value to `true` to enable debugging mode.  
     Note that it's far safer to remove the entire configuration block in acceptance/production environments.
