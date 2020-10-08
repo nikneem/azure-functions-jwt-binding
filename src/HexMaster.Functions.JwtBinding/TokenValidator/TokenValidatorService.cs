@@ -53,6 +53,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 var claimsPrincipal = handler.ValidateToken(value.Parameter, validationParameter, out var token);
                 ValidateScopes(token, config.Scopes);
                 ValidateRoles(token, config.Roles);
+                ValidateIdentities(token, config.AllowedIdentities);
 
                 var displayName = GetDisplayNameFromToken(claimsPrincipal);
                 return  GetAuthorizedModelFromToken(token, displayName);
@@ -146,6 +147,27 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             else
             {
                 throw new AuthorizationScopesException("Failed to validate roles because the passed token could not be converted to a valid JwtSecurityToken object");
+            }
+        }
+
+        private void ValidateIdentities(SecurityToken validatedToken, string allowedIdentities)
+        {
+            if (string.IsNullOrWhiteSpace(allowedIdentities))
+            {
+                return;
+            }
+            var identities = allowedIdentities.Split(',');
+
+            if (validatedToken is JwtSecurityToken jwtToken)
+            {
+                if (!identities.Any(i => string.Equals(i, jwtToken.Subject, StringComparison.OrdinalIgnoreCase)))
+                {
+                    throw new IdentityNotAllowedException(jwtToken.Subject);
+                }
+            }
+            else
+            {
+                throw new AuthorizationScopesException("Failed to validate identity because the passed token could not be converted to a valid JwtSecurityToken object");
             }
         }
 

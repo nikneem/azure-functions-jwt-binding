@@ -75,6 +75,7 @@ namespace HexMaster.Functions.JwtBinding
             configuration.Scopes = arg.Scopes ?? configuration.Scopes;
             configuration.Roles = arg.Roles ?? configuration.Roles;
             configuration.Signature = arg.Signature ?? configuration.Signature;
+            configuration.AllowedIdentities = arg.AllowedIdentities ?? configuration.AllowedIdentities;
             return configuration;
         }
     }
