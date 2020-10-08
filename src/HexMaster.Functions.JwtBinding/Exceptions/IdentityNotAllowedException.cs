@@ -1,7 +1,6 @@
 ﻿using System;
-using HexMaster.Functions.JwtBinding.Exceptions;
 
-namespace HexMaster.Functions.JwtBinding.TokenValidator
+namespace HexMaster.Functions.JwtBinding.Exceptions
 {
     public class IdentityNotAllowedException : AuthorizationScopesException
     {
