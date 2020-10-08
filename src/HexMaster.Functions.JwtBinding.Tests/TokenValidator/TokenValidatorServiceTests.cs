@@ -28,6 +28,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         private string _signature;
         private string _givenName;
         private string _scopes;
+        private string _allowedIdentities;
 
         [SetUp]
         public void Setup()
@@ -94,6 +95,44 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             Assert.Throws<AuthorizationFailedException>(Act);
         }
 
+        [Test]
+        public void WhenAllowedIdenityIsInvalid_ThenItReturnsAuthorizedModel()
+        {
+            WithValidJwtToken();
+            WithoutAllowedIdentitiesSpecified();
+            var model = Validate();
+            Assert.AreEqual(model.Subject, _subject);
+            Assert.AreEqual(model.Name, _givenName);
+        }
+
+        [Test]
+        public void WhenMultipleAllowedIdentitiesSpecified_ThenItReturnsAuthorizedModel()
+        {
+            WithValidJwtToken();
+            WithAllowedIdentitiesSpecifiedMatchingTheSubject();
+            var model = Validate();
+            Assert.AreEqual(model.Subject, _subject);
+            Assert.AreEqual(model.Name, _givenName);
+        }
+
+        [Test]
+        public void WhenAllowedIdentitiesSpecifiedMatchingTheSubject_ThenItReturnsAuthorizedModel()
+        {
+            WithValidJwtToken();
+            WithAllowedIdentitiesSpecifiedMatchingTheSubject();
+            var model = Validate();
+            Assert.AreEqual(model.Subject, _subject);
+            Assert.AreEqual(model.Name, _givenName);
+        }
+
+        [Test]
+        public void WhenMultipleAllowedIdentitiesSpecifiedAndNoneAreInTheToken_ThenItReturnsAuthorizedModel()
+        {
+            WithValidJwtToken();
+            WithMultipleAllowedIdentitiesSpecifiedAndNoneAreInTheSubject();
+            var ex = Assert.Throws<AuthorizationFailedException>(Act);
+            Assert.That(ex.InnerException.GetType(), Is.EqualTo(typeof(IdentityNotAllowedException)));
+        }
 
         private void WithInvalidScheme()
         {
@@ -125,6 +164,23 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             _scopes = "nothing:nothing";
         }
 
+        private void WithoutAllowedIdentitiesSpecified()
+        {
+            _allowedIdentities = null;
+        }
+        private void WithAllowedIdentitiesSpecifiedMatchingTheSubject()
+        {
+            _allowedIdentities = _subject;
+        }
+        private void WithMultipleAllowedIdentitiesSpecified()
+        {
+            _allowedIdentities = $"Some,More,{_subject},Identities";
+        }
+        private void WithMultipleAllowedIdentitiesSpecifiedAndNoneAreInTheSubject()
+        {
+            _allowedIdentities = $"Some,More,Identities";
+        }
+
         private void WithValidJwtToken()
         {
             _audience = "my-valid-audience";
@@ -134,6 +190,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             _givenName = "Tommy Token";
             _signature = Guid.NewGuid().ToString();
             _scopes = "something:create,other:list";
+            _allowedIdentities = "";
             _token = CreateJwtToken();
         }
 
@@ -180,7 +237,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                 Signature = _signature,
                 Scopes = _scopes,
                 Audience = _audience,
-                Issuer = _issuer
+                Issuer = _issuer,
+                AllowedIdentities = _allowedIdentities
             };
             _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
