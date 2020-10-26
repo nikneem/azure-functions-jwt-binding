@@ -6,6 +6,7 @@
         public const string SectionName = Constants.ConfigurationSectionName;
 
         public string Issuer { get; set; }
+        public string IssuerPattern { get; set; }
         public string Audience { get; set; }
         public string Signature { get; set; }
         public string Scopes { get; set; }
