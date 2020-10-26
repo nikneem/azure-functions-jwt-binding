@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HexMaster.Functions.JwtBinding.Configuration;
 using HexMaster.Functions.JwtBinding.Exceptions;
@@ -34,7 +35,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 throw new ConfigurationException("Configuring an issuer is required in order to validate a JWT Token");
             }
 
-            var validationParameter = GetTokenValidationParameters(config.Issuer, config.Audience);
+            var validationParameter = GetTokenValidationParameters(config.Issuer, config.Audience, config.IssuerPattern);
 
             if (!string.IsNullOrWhiteSpace(config.Signature))
             {
@@ -51,6 +52,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             {
                 var handler = new JwtSecurityTokenHandler();
                 var claimsPrincipal = handler.ValidateToken(value.Parameter, validationParameter, out var token);
+                ValidateIssuerPattern(token, config.IssuerPattern);
                 ValidateScopes(token, config.Scopes);
                 ValidateRoles(token, config.Roles);
                 ValidateIdentities(token, config.AllowedIdentities);
@@ -89,6 +91,19 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             }
 
             return null;
+        }
+
+        private  void ValidateIssuerPattern(SecurityToken token, string issuerPattern)
+        {
+            if (string.IsNullOrWhiteSpace(issuerPattern))
+            {
+                return;
+            }
+
+            if (!Regex.IsMatch(token.Issuer, issuerPattern))
+            {
+                throw new IssuerPatternValidationException(token.Issuer, issuerPattern);
+            }
         }
 
         private  void ValidateScopes(SecurityToken token, string scopes)
@@ -181,15 +196,16 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             return null;
         }
 
-        private static TokenValidationParameters GetTokenValidationParameters(string issuer, string audience)
+        private static TokenValidationParameters GetTokenValidationParameters(string issuer, string audience, string issuerPattern)
         {
+            var validateIssuer = string.IsNullOrWhiteSpace(issuerPattern);
             var validationParameter = new TokenValidationParameters
             {
                 RequireSignedTokens = false,
                 ValidAudience = audience,
                 ValidateAudience = !string.IsNullOrWhiteSpace(audience),
                 ValidIssuer = issuer,
-                ValidateIssuer = true,
+                ValidateIssuer = validateIssuer,
                 ValidateIssuerSigningKey = false,
                 ValidateLifetime = true
             };

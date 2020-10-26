@@ -22,6 +22,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         private TokenValidatorService _service;
         private string _audience;
         private string _issuer;
+        private string _issuerPattern;
         private string _scheme;
         private string _token;
         private string _subject;
@@ -68,6 +69,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         {
             WithValidJwtToken();
             WithInvalidIssuer();
+            WithoutIssuerPattern();
             Assert.Throws<AuthorizationFailedException>(Act);
         }
 
@@ -126,12 +128,31 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         }
 
         [Test]
-        public void WhenMultipleAllowedIdentitiesSpecifiedAndNoneAreInTheToken_ThenItReturnsAuthorizedModel()
+        public void WhenMultipleAllowedIdentitiesSpecifiedAndNoneAreInTheToken_ThenItThrowsAuthorizationFailedException()
         {
             WithValidJwtToken();
             WithMultipleAllowedIdentitiesSpecifiedAndNoneAreInTheSubject();
             var ex = Assert.Throws<AuthorizationFailedException>(Act);
             Assert.That(ex.InnerException.GetType(), Is.EqualTo(typeof(IdentityNotAllowedException)));
+        }
+
+        [Test]
+        public void WhenInvalidIssuerButValidIssuerPatternInTheToken_ThenItReturnsAuthorizedModel()
+        {
+            WithValidJwtToken();
+            WithInvalidIssuer();
+            WithValidIssuerPattern();
+            var model = Validate();
+            Assert.AreEqual(model.Subject, _subject);
+            Assert.AreEqual(model.Name, _givenName);
+        }
+        [Test]
+        public void WhenInvalidIssuerAndInvalidIssuerPatternInTheToken_ThenItThrowsAuthorizationFailedException()
+        {
+            WithValidJwtToken();
+            WithInvalidIssuerPattern();
+            var ex = Assert.Throws<AuthorizationFailedException>(Act);
+            Assert.That(ex.InnerException.GetType(), Is.EqualTo(typeof(IssuerPatternValidationException)));
         }
 
         private void WithInvalidScheme()
@@ -146,7 +167,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
 
         private void WithInvalidIssuer()
         {
-            _issuer = "https://random-issuer.com";
+            _issuer = "https://my-random-issuer.com";
         }
 
         private void WithEmptyIssuer()
@@ -162,6 +183,19 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         private void WithInvalidScopes()
         {
             _scopes = "nothing:nothing";
+        }
+        
+        private void WithoutIssuerPattern()
+        {
+            _issuerPattern = string.Empty;
+        }
+        private void WithValidIssuerPattern()
+        {
+            _issuerPattern = "https://my.*";
+        }
+        private void WithInvalidIssuerPattern()
+        {
+            _issuerPattern = "eduard";
         }
 
         private void WithoutAllowedIdentitiesSpecified()
@@ -238,6 +272,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                 Scopes = _scopes,
                 Audience = _audience,
                 Issuer = _issuer,
+                IssuerPattern = _issuerPattern,
                 AllowedIdentities = _allowedIdentities
             };
             _service.ValidateToken(
@@ -252,7 +287,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
                 Signature = _signature,
                 Scopes = _scopes,
                 Audience = _audience,
-                Issuer = _issuer
+                Issuer = _issuer,
+                IssuerPattern = _issuerPattern
             };
             return _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
