@@ -41,6 +41,7 @@ namespace HexMaster.Functions.JwtBinding
         private AuthorizedModel BuildItemFromAttribute(JwtBindingAttribute arg)
         {
             var configuration = GetFunctionConfiguration(arg);
+
             if ((configuration.DebugConfiguration?.Enabled).GetValueOrDefault())
             {
                 _logger.LogWarning("## WARNING ## - The JWT Validation Binding is running in DEBUG mode and currently returns fixed values!");
@@ -56,14 +57,23 @@ namespace HexMaster.Functions.JwtBinding
                 _logger.LogWarning("No valid issuer configured, cannot validate token");
                 throw new ArgumentNullException(nameof(arg.Issuer), "The JwtBinding requires an issuer to validate JWT Tokens");
             }
+
             if (_http.HttpContext != null)
             {
                 var authHeaderValue = _http.HttpContext.Request.Headers["Authorization"];
-                var headerValue = AuthenticationHeaderValue.Parse(authHeaderValue);
-                _logger.LogInformation("Now validating token");
 
-                return _service.ValidateToken(headerValue, configuration);
+                if (AuthenticationHeaderValue.TryParse(authHeaderValue, out AuthenticationHeaderValue headerValue))
+                {
+                    _logger.LogInformation("Now validating token");
+
+                    return _service.ValidateToken(headerValue, configuration);
+                }
+                else
+                {
+                    throw new ArgumentNullException("The JwtBinding requires the Authorization header in the request");
+                }
             }
+
             throw new AuthorizationOperationException();
         }
 
