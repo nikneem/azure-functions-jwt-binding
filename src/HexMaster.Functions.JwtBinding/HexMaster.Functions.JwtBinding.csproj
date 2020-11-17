@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <Authors>Eduard Keilholz</Authors>
     <Product>Azure Functions JWT Validation Input Binding</Product>
     <Description>This is an input binding for Azure Functions allowing you to validate JWT tokens for Azure Functions with a HTTP trigger.</Description>
@@ -12,16 +12,18 @@
 	<IconUrl>https://github.com/nikneem/azure-functions-jwt-binding/raw/main/logo.png</IconUrl>
     <RepositoryUrl>https://github.com/nikneem/azure-functions-jwt-binding</RepositoryUrl>
     <PackageTags>C#, Azure Functions, Binding, JWT, Token, Validation</PackageTags>
-    <PackageReleaseNotes>Added pattern validation for the issuer. For more information, see issue #31 on GitHub (https://github.com/nikneem/azure-functions-jwt-binding/issues/31)
+    <PackageReleaseNotes>Added a check for existence of the Authorization header in the HTTP request and throws in case it's missing
+
+Added pattern validation for the issuer. For more information, see issue #31 on GitHub (https://github.com/nikneem/azure-functions-jwt-binding/issues/31)
 
 Added options pattern. This means you no longer have to pass configuration values through the binding attributes. Values from you app config are used instead. You can still use the attribute configuration to configure the binding, or to overwrite the default configuration.
 
 - 1.1.2 - Fixed configuration bug
 - 1.2.0 - Added AllowedIdenities feature</PackageReleaseNotes>
-    <FileVersion>1.3.0.0</FileVersion>
+    <FileVersion>1.3.1.0</FileVersion>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>logo.png</PackageIcon>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <AssemblyVersion>1.3.1.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

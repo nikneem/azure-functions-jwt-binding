@@ -68,10 +68,10 @@ namespace HexMaster.Functions.JwtBinding
 
                     return _service.ValidateToken(headerValue, configuration);
                 }
-                else
-                {
-                    throw new ArgumentNullException("The JwtBinding requires the Authorization header in the request");
-                }
+
+                throw new AuthorizationFailedException(
+                    new Exception("Authorization header is missing, add a bearer token to the header of your HTTP request")
+                    );
             }
 
             throw new AuthorizationOperationException();
