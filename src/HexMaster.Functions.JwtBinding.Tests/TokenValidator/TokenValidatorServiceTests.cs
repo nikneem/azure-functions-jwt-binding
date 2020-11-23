@@ -66,10 +66,8 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         public void WhenTokenWithX509CertificateSingingKeyIsInvalid_ThenItThrowsAuthorizationFailedException()
         {
             WithInvalidX509CertificateSigningKey();
-            WithValidJwtToken();
-
-            var exception = Assert.Throws<AuthorizationFailedException>(Act);
-            Assert.That(exception.Message.Contains("Signature validation failed. Unable to match key"));
+            WithValidJwtToken(); 
+            Assert.Throws<AuthorizationFailedException>(Act);
         }
 
         [Test]
