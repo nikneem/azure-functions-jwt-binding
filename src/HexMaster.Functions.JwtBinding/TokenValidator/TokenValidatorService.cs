@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -36,16 +37,11 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             }
 
             var validationParameter = GetTokenValidationParameters(config.Issuer, config.Audience, config.IssuerPattern);
-
-            if (!string.IsNullOrWhiteSpace(config.Signature))
+           
+            validationParameter.IssuerSigningKey = GetIssuerSigningKey(config);
+            if(validationParameter.IssuerSigningKey == default)
             {
-                var sig = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.Signature));
-                validationParameter.IssuerSigningKey = sig;
-            }
-            else
-            {
-                var securityKeys = GetSigningKeys(config.Issuer).Result;
-                validationParameter.IssuerSigningKeys = securityKeys;
+                validationParameter.IssuerSigningKeys = RetrieveIssuerSigningKeys(config.Issuer).Result;
             }
 
             try
@@ -212,7 +208,25 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             return validationParameter;
         }
 
-        private async Task<ICollection<SecurityKey>> GetSigningKeys(string issuer)
+        
+        private static SecurityKey GetIssuerSigningKey(JwtBindingConfiguration config)
+        {
+            if (!string.IsNullOrWhiteSpace(config.SymmetricSecuritySigningKey))
+            {
+                return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SymmetricSecuritySigningKey));
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.X509CertificateSigningKey))
+            {
+                var certificate = new X509Certificate2(Convert.FromBase64String(config.X509CertificateSigningKey));
+                var certificateKey = new X509SecurityKey(certificate);
+                return certificateKey;
+            }
+
+            return null;
+        }
+
+        private async Task<ICollection<SecurityKey>> RetrieveIssuerSigningKeys(string issuer)
         {
             if (_securityKeys == null)
             {

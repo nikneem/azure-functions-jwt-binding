@@ -84,7 +84,8 @@ namespace HexMaster.Functions.JwtBinding
             configuration.Audience = arg.Audience ?? configuration.Audience;
             configuration.Scopes = arg.Scopes ?? configuration.Scopes;
             configuration.Roles = arg.Roles ?? configuration.Roles;
-            configuration.Signature = arg.Signature ?? configuration.Signature;
+            configuration.SymmetricSecuritySigningKey = arg.Signature ?? configuration.SymmetricSecuritySigningKey;
+            configuration.X509CertificateSigningKey = arg.X509CertificateSigningKey ?? configuration.X509CertificateSigningKey;
             configuration.AllowedIdentities = arg.AllowedIdentities ?? configuration.AllowedIdentities;
             return configuration;
         }
