@@ -40,8 +40,12 @@ namespace HexMaster.Functions.JwtBinding
         public string Issuer { get; set; }
         
         [AutoResolve] 
-        [Description("Pass in a valid signature key. If no signature is passed, the validator will try to download them from your token provider. When that fails, the token validation fails.")]
+        [Description("Pass in a valid symmetric security signing key. If no signature is passed, the validator will try to download them from your token provider. When that fails, the token validation fails.")]
         public string Signature { get; set; }
+        
+        [AutoResolve] 
+        [Description("Pass in a valid base64-encoded X509 certificate public key. If there is no value for Signature nor X509CertificateSigningKey parameter, the validator will try to download the signing keys from your token provider, i.e. Issuer. When that fails, the token validation fails.")]
+        public string X509CertificateSigningKey { get; set; }
 
         [AutoResolve]
         [Description("Comma seperated identifiers of identities which are allowed. This will try to be matched on the `sub` claim of the token.")]

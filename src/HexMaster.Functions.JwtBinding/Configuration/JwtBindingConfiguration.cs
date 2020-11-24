@@ -8,14 +8,12 @@
         public string Issuer { get; set; }
         public string IssuerPattern { get; set; }
         public string Audience { get; set; }
-        public string Signature { get; set; }
+        public string SymmetricSecuritySigningKey { get; set; }
+        public string X509CertificateSigningKey { get; set; }
         public string Scopes { get; set; }
         public string Roles { get; set; }
         public string AllowedIdentities { get; set; }
 
         public JwtBindingDebugConfiguration DebugConfiguration { get; set; }
-
-
-
     }
 }
