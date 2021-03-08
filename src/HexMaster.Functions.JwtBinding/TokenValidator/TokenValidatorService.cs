@@ -104,7 +104,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
 
         private  void ValidateScopes(SecurityToken token, string scopes)
         {
-            var validScopeClaimTypes = new[] {"scp"};
+            var validScopeClaimTypes = new[] {"scp","scope"};
             if (string.IsNullOrWhiteSpace(scopes))
             {
                 return;
