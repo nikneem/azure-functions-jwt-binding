@@ -43,6 +43,8 @@ The following properties are available using the configuration:
 
 * **AllowedIdentities** is an optional list of (comma separated) identities. When configured, the subject of the token is matched against one of the specified identities. If not found, an exception is thrown. If no identities were configured, identity validation will be skipped.
 
+* **Header** is an optional value to change the name of the header used for Authorization. i.e. if you want to use `X-Authorization` instead of `Authorization`
+
 * **DebugConfiguration** is a nested object allowing you to configure your environment for running in debug (development) mode.
     * **Enabled** is a switch to turn debug mode on or off. Set this value to `true` to enable debugging mode.  
     Note that it's far safer to remove the entire configuration block in acceptance/production environments.
@@ -57,6 +59,7 @@ This example is an example which you can use to paste in your *local.settings.js
     "JwtBinding:Audience": "your-secret-api",
     "JwtBinding:Scopes": "data:read,data:write",
     "JwtBinding:Roles": "Role1,Role2",
+    "JwtBinding:Header": "X-Authorization",
     "JwtBinding:AllowedIdentities": "Identity1,Identity2",
     "JwtBinding:DebugConfiguration:Enabled": true,
     "JwtBinding:DebugConfiguration:Subject": "TheSubject",

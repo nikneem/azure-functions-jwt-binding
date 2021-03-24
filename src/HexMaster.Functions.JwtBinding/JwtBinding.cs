@@ -60,7 +60,7 @@ namespace HexMaster.Functions.JwtBinding
 
             if (_http.HttpContext != null)
             {
-                var authHeaderValue = _http.HttpContext.Request.Headers["Authorization"];
+                var authHeaderValue = _http.HttpContext.Request.Headers[configuration.Header];
 
                 if (AuthenticationHeaderValue.TryParse(authHeaderValue, out AuthenticationHeaderValue headerValue))
                 {
@@ -87,6 +87,7 @@ namespace HexMaster.Functions.JwtBinding
             configuration.SymmetricSecuritySigningKey = arg.Signature ?? configuration.SymmetricSecuritySigningKey;
             configuration.X509CertificateSigningKey = arg.X509CertificateSigningKey ?? configuration.X509CertificateSigningKey;
             configuration.AllowedIdentities = arg.AllowedIdentities ?? configuration.AllowedIdentities;
+            configuration.Header = arg.Header ?? configuration.Header ?? "Authorization";
             return configuration;
         }
     }

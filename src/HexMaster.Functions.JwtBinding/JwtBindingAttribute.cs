@@ -13,7 +13,7 @@ namespace HexMaster.Functions.JwtBinding
         {
         }
 
-        public JwtBindingAttribute(string issuer = null, string audience = null, string scopes = null, string roles = null, string signature = null, string allowedIdentities = null)
+        public JwtBindingAttribute(string issuer = null, string audience = null, string scopes = null, string roles = null, string signature = null, string allowedIdentities = null, string header = null)
         {
             Issuer = issuer;
             Audience = audience;
@@ -21,6 +21,7 @@ namespace HexMaster.Functions.JwtBinding
             Roles = roles;
             Signature = signature;
             AllowedIdentities = allowedIdentities;
+            Header = header;
         }
 
         [AutoResolve] 
@@ -50,5 +51,9 @@ namespace HexMaster.Functions.JwtBinding
         [AutoResolve]
         [Description("Comma seperated identifiers of identities which are allowed. This will try to be matched on the `sub` claim of the token.")]
         public string AllowedIdentities { get; set; }
+
+        [AutoResolve]
+        [Description("The name of the header to use that contains the Bearer token.")]
+        public string Header { get; set; }
     }
 }
