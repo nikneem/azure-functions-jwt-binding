@@ -13,6 +13,7 @@
         public string Scopes { get; set; }
         public string Roles { get; set; }
         public string AllowedIdentities { get; set; }
+        public string Header { get; set; }
 
         public JwtBindingDebugConfiguration DebugConfiguration { get; set; }
     }
