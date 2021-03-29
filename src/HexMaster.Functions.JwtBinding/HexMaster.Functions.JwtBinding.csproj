@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.4.1</Version>
+    <Version>1.4.2</Version>
     <Authors>Eduard Keilholz</Authors>
     <Product>Azure Functions JWT Validation Input Binding</Product>
     <Description>This is an input binding for Azure Functions allowing you to validate JWT tokens for Azure Functions with a HTTP trigger.</Description>
@@ -12,7 +12,7 @@
 	<IconUrl>https://github.com/nikneem/azure-functions-jwt-binding/raw/main/logo.png</IconUrl>
     <RepositoryUrl>https://github.com/nikneem/azure-functions-jwt-binding</RepositoryUrl>
     <PackageTags>C#, Azure Functions, Binding, JWT, Token, Validation</PackageTags>
-    <PackageReleaseNotes>Added support for a custom authorization header through configuration (issue #44)
+    <PackageReleaseNotes>Added support for a custom authorization header through configuration (issue #42)
 
 Added support for X905 Certificate signatures
 
@@ -24,10 +24,10 @@ Added options pattern. This means you no longer have to pass configuration value
 
 - 1.1.2 - Fixed configuration bug
 - 1.2.0 - Added AllowedIdenities feature</PackageReleaseNotes>
-    <FileVersion>1.4.1.0</FileVersion>
+    <FileVersion>1.4.2.0</FileVersion>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>logo.png</PackageIcon>
-    <AssemblyVersion>1.4.1.0</AssemblyVersion>
+    <AssemblyVersion>1.4.2.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
