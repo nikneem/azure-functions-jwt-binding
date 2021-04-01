@@ -87,7 +87,7 @@ namespace HexMaster.Functions.JwtBinding
             configuration.SymmetricSecuritySigningKey = arg.Signature ?? configuration.SymmetricSecuritySigningKey;
             configuration.X509CertificateSigningKey = arg.X509CertificateSigningKey ?? configuration.X509CertificateSigningKey;
             configuration.AllowedIdentities = arg.AllowedIdentities ?? configuration.AllowedIdentities;
-            configuration.Header = arg.Header ?? configuration.Header ?? "Authorization";
+            configuration.Header = arg.Header ?? configuration.Header ?? Constants.DefaultAuthorizationHeader;
             return configuration;
         }
     }
