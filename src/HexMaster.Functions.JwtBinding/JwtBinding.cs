@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using HexMaster.Functions.JwtBinding.Configuration;
 using HexMaster.Functions.JwtBinding.Exceptions;
 using HexMaster.Functions.JwtBinding.Model;
@@ -48,7 +50,8 @@ namespace HexMaster.Functions.JwtBinding
                 return new AuthorizedModel
                 {
                     Name = configuration.DebugConfiguration?.Name,
-                    Subject = configuration.DebugConfiguration?.Subject
+                    Subject = configuration.DebugConfiguration?.Subject,
+                    User = GetUserFromDebugConfiguration(configuration)
                 };
             }
 
@@ -89,6 +92,23 @@ namespace HexMaster.Functions.JwtBinding
             configuration.AllowedIdentities = arg.AllowedIdentities ?? configuration.AllowedIdentities;
             configuration.Header = arg.Header ?? configuration.Header ?? Constants.DefaultAuthorizationHeader;
             return configuration;
+        }
+
+        private ClaimsPrincipal GetUserFromDebugConfiguration(JwtBindingConfiguration configuration)
+        {
+            var subject = configuration.DebugConfiguration?.Subject;
+            var name = configuration.DebugConfiguration?.Name;
+            var claimsIdentity = new ClaimsIdentity();
+
+            if (!string.IsNullOrEmpty(subject)) {
+                claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.NameId, subject));
+            }
+
+            if (!string.IsNullOrEmpty(name)) {
+                claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.GivenName, name));
+            }
+
+            return new ClaimsPrincipal(claimsIdentity);
         }
     }
 }

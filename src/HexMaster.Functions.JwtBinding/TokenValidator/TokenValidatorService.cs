@@ -37,7 +37,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             }
 
             var validationParameter = GetTokenValidationParameters(config.Issuer, config.Audience, config.IssuerPattern);
-           
+
             validationParameter.IssuerSigningKey = GetIssuerSigningKey(config);
             if(validationParameter.IssuerSigningKey == default)
             {
@@ -47,6 +47,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             try
             {
                 var handler = new JwtSecurityTokenHandler();
+                handler.InboundClaimTypeMap.Clear();
                 var claimsPrincipal = handler.ValidateToken(value.Parameter, validationParameter, out var token);
                 ValidateIssuerPattern(token, config.IssuerPattern);
                 ValidateScopes(token, config.Scopes);
@@ -54,7 +55,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 ValidateIdentities(token, config.AllowedIdentities);
 
                 var displayName = GetDisplayNameFromToken(claimsPrincipal);
-                return  GetAuthorizedModelFromToken(token, displayName);
+                return GetAuthorizedModelFromToken(token, displayName, claimsPrincipal);
             }
             catch (SecurityTokenSignatureKeyNotFoundException ex1)
             {
@@ -73,7 +74,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             }
         }
 
-        private static AuthorizedModel GetAuthorizedModelFromToken(SecurityToken token, string displayName)
+        private static AuthorizedModel GetAuthorizedModelFromToken(SecurityToken token, string displayName, ClaimsPrincipal claimsPrincipal)
         {
             if (token is JwtSecurityToken jwtToken)
             {
@@ -82,7 +83,8 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
                 return new AuthorizedModel
                 {
                     Subject = jwtToken.Subject ?? nameId,
-                    Name = displayName ?? givenName
+                    Name = displayName ?? givenName,
+                    User = claimsPrincipal
                 };
             }
 
@@ -208,7 +210,7 @@ namespace HexMaster.Functions.JwtBinding.TokenValidator
             return validationParameter;
         }
 
-        
+
         private static SecurityKey GetIssuerSigningKey(JwtBindingConfiguration config)
         {
             if (!string.IsNullOrWhiteSpace(config.SymmetricSecuritySigningKey))
