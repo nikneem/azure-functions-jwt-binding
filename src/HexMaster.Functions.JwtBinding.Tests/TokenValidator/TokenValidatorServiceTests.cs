@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
@@ -49,6 +50,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
 
             Assert.AreEqual(model.Subject, _subject);
             Assert.AreEqual(model.Name, _givenName);
+            AssertExpectedUserClaims(model);
         }
 
         [Test]
@@ -60,6 +62,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
 
             Assert.AreEqual(model.Subject, _subject);
             Assert.AreEqual(model.Name, _givenName);
+            AssertExpectedUserClaims(model);
         }
 
         [Test]
@@ -127,6 +130,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             var model = Validate();
             Assert.AreEqual(model.Subject, _subject);
             Assert.AreEqual(model.Name, _givenName);
+            AssertExpectedUserClaims(model);
         }
 
         [Test]
@@ -137,6 +141,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             var model = Validate();
             Assert.AreEqual(model.Subject, _subject);
             Assert.AreEqual(model.Name, _givenName);
+            AssertExpectedUserClaims(model);
         }
 
         [Test]
@@ -147,6 +152,7 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             var model = Validate();
             Assert.AreEqual(model.Subject, _subject);
             Assert.AreEqual(model.Name, _givenName);
+            AssertExpectedUserClaims(model);
         }
 
         [Test]
@@ -162,11 +168,13 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
         public void WhenInvalidIssuerButValidIssuerPatternInTheToken_ThenItReturnsAuthorizedModel()
         {
             WithValidJwtToken();
+            var tokenIssuer = _issuer;
             WithInvalidIssuer();
             WithValidIssuerPattern();
             var model = Validate();
             Assert.AreEqual(model.Subject, _subject);
             Assert.AreEqual(model.Name, _givenName);
+            AssertExpectedUserClaims(model, expectedIssuer: tokenIssuer);
         }
         [Test]
         public void WhenInvalidIssuerAndInvalidIssuerPatternInTheToken_ThenItThrowsAuthorizationFailedException()
@@ -337,6 +345,26 @@ namespace HexMaster.Functions.JwtBinding.Tests.TokenValidator
             return _service.ValidateToken(
                 new AuthenticationHeaderValue(_scheme, _token),
                 config);
+        }
+
+        private void AssertExpectedUserClaims(
+            AuthorizedModel model, 
+            string expectedIssuer = null, 
+            string expectedAudience = null,
+            string expectedSubject = null,
+            string expectedGivenName = null,
+            string expectedScopes = null)
+        {
+            Assert.IsTrue(model.User.Identity.IsAuthenticated);
+            Assert.AreEqual(model.User.FindFirst(JwtRegisteredClaimNames.Iss)?.Value, expectedIssuer ?? _issuer);
+            Assert.AreEqual(model.User.FindFirst(JwtRegisteredClaimNames.Aud)?.Value, expectedAudience ?? _audience);
+            Assert.AreEqual(model.User.FindFirst(JwtRegisteredClaimNames.NameId)?.Value, expectedSubject ?? _subject);
+            Assert.AreEqual(model.User.FindFirst(JwtRegisteredClaimNames.GivenName)?.Value, expectedGivenName ?? _givenName);
+            var scopeClaims = model.User.FindAll("scp");
+            foreach (var expectedScope in (expectedScopes ?? _scopes).Split(','))
+            {
+                Assert.IsTrue(scopeClaims.Any(claim => claim.Value == expectedScope));
+            }
         }
     }
 }
